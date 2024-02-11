@@ -25,7 +25,7 @@ Refresh Color Function: Updates the color of each time block based on the curren
 ## Link for GitHUB
 https://github.com/hementB2/Assignment5
 
-## Linkf ro Application
-
+## Link for Application
+https://hementb2.github.io/Assignment5/
 
 
