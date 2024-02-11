@@ -1,31 +1,59 @@
-// Set the date at the top of the page
-$("#currentDay").text(moment().format("dddd, MMMM Do"));
 
-// Set the status of each time-block
-$(".time-block").each(function() {
-  var currentTime = moment().hours();
-  var timeBlock = parseInt($(this).attr("id").split("-")[1]);
-  if (timeBlock < currentTime) {
-    $(this).addClass("past");
-  } else if (timeBlock === currentTime) {
-    $(this).addClass("present");
-  } else {
-    $(this).addClass("future");
-  }
-});
 
-// Load any saved data from localStorage
-$(".description").each(function() {
-  var timeBlock = $(this).parent().attr("id");
-  var savedData = localStorage.getItem(timeBlock);
-  if (savedData) {
-    $(this).val(savedData);
-  }
-});
+  const localeSettings = {};
+  dayjs.locale(localeSettings);
 
-// Save the data to localStorage on click
-$(".saveBtn").on("click", function() {
-  var timeBlock = $(this).parent().attr("id");
-  var description = $(this).siblings(".description").val();
-  localStorage.setItem(timeBlock, description);
-});
+  $(function () {
+
+    const currentHour = dayjs().format('H');
+
+    function hourlyColor() {
+      $('.time-block').each(function() {
+        const blockHour = parseInt(this.id);
+        $(this).toggleClass('past', blockHour < currentHour);
+        $(this).toggleClass('present', blockHour === currentHour);
+        $(this).toggleClass('future', blockHour > currentHour);
+      });
+    }
+
+    function textEntry() {
+      $('.saveBtn').on('click', function() {
+        const key = $(this).parent().attr('id');
+        const value = $(this).siblings('.description').val();
+        localStorage.setItem(key, value);
+      });
+    }
+
+    function refreshColor() {
+      $('.time-block').each(function() {
+        const blockHour = parseInt(this.id);
+        if (blockHour == currentHour) {
+          $(this).removeClass('past future').addClass('present');
+        } else if (blockHour < currentHour) {
+          $(this).removeClass('future present').addClass('past');
+        } else {
+          $(this).removeClass('past present').addClass('future');
+        }
+      });
+    }
+
+    $('.time-block').each(function() {
+      const key = $(this).attr('id');
+      const value = localStorage.getItem(key);
+      $(this).children('.description').val(value);
+    });
+  
+    function updateTime() {
+      const dateElement = $('#date');
+      const timeElement = $('#time');
+      const currentDate = dayjs().format('dddd, MMMM D, YYYY');
+      const currentTime = dayjs().format('hh:mm:ss A');
+      dateElement.text(currentDate);
+      timeElement.text(currentTime);
+    }
+
+    hourlyColor();
+    textEntry();                
+    refreshColor();
+    setInterval(updateTime, 1000);
+  });
